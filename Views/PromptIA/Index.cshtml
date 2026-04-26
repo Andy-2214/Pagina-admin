@@ -1,0 +1,23 @@
+@model TuProyecto.Models.PromptIA
+
+<h2>Gestión de Prompt IA</h2>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Prompt Actual</h5>
+        <p class="card-text">@Model.Texto</p>
+    </div>
+</div>
+
+<hr />
+
+<h4>Modificar Prompt</h4>
+
+<form method="post" action="/PromptIA/Actualizar">
+    <div class="mb-3">
+        <label>Nuevo Prompt</label>
+        <textarea name="Texto" class="form-control" 
+                  rows="6">@Model.Texto</textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Guardar</button>
+</form>

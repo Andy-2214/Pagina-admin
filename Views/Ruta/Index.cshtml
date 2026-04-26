@@ -1,0 +1,43 @@
+@model IEnumerable<TuProyecto.Models.Ruta>
+
+<h2>Gestión de Rutas</h2>
+
+<a href="/Ruta/Crear" class="btn btn-primary mb-3">+ Agregar Ruta</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Color</th>
+            <th>Avenidas</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ruta in Model)
+        {
+            <tr>
+                <td>@ruta.Codigo</td>
+                <td>@ruta.Nombre</td>
+                <td>
+                    <span style="background-color:@ruta.Color; 
+                          padding:5px 15px; border-radius:4px;">
+                        @ruta.Color
+                    </span>
+                </td>
+                <td>@ruta.Avenidas</td>
+                <td>
+                    <a href="/Ruta/Eliminar/@ruta.Id" 
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Eliminar esta ruta?')">
+                        Eliminar
+                    </a>
+<a href="/Ruta/Editar/@ruta.Id" class="btn btn-warning btn-sm">
+    Editar
+</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

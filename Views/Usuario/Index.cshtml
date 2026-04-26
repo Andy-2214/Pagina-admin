@@ -1,0 +1,31 @@
+@model IEnumerable<TuProyecto.Models.Usuario>
+
+<h2>Gestión de Usuarios</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Fecha Registro</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var usuario in Model)
+        {
+            <tr>
+                <td>@usuario.Nombre</td>
+                <td>@usuario.Email</td>
+                <td>@usuario.FechaRegistro.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <a href="/Usuario/Eliminar/@usuario.Id"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Eliminar este usuario?')">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

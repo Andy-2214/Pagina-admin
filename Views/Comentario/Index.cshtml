@@ -1,0 +1,33 @@
+@model IEnumerable<TuProyecto.Models.Comentario>
+
+<h2>Gestión de Comentarios</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Ruta ID</th>
+            <th>Usuario ID</th>
+            <th>Comentario</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var comentario in Model)
+        {
+            <tr>
+                <td>@comentario.RutaId</td>
+                <td>@comentario.UsuarioId</td>
+                <td>@comentario.Texto</td>
+                <td>@comentario.Fecha.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <a href="/Comentario/Eliminar/@comentario.Id"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Eliminar este comentario?')">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
