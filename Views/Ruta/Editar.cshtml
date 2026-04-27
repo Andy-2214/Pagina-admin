@@ -27,6 +27,11 @@
         <textarea name="Avenidas" class="form-control" 
                   rows="3">@Model.Avenidas</textarea>
     </div>
+    <div class="mb-3">
+        <label>Coordenadas (JSON)</label>
+        <textarea name="CoordenadasJson" class="form-control" rows="5">@Model.CoordenadasJson</textarea>
+        <small class="text-muted">Formato: [{"lat": -16.40, "lng": -71.54}]</small>
+    </div>
     <button type="submit" class="btn btn-success">Guardar</button>
     <a href="/Ruta/Index" class="btn btn-secondary">Cancelar</a>
 </form>
