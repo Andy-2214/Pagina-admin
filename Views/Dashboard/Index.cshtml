@@ -1,0 +1,121 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>📊 Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body text-center">
+                <h1>@ViewBag.TotalUsuarios</h1>
+                <p>👤 Usuarios registrados</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body text-center">
+                <h1>@ViewBag.TotalRutas</h1>
+                <p>🚌 Rutas registradas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body text-center">
+                <h1>@ViewBag.TotalComentarios</h1>
+                <p>💬 Comentarios totales</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body text-center">
+                <h1>@ViewBag.TotalDestacados</h1>
+                <p>⭐ Comentarios destacados</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Distribución por género -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>👥 Por género</h5>
+                @foreach (var item in ViewBag.PorGenero)
+                {
+                    <div class="d-flex justify-content-between">
+                        <span>@item.Key</span>
+                        <strong>@item.Value</strong>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Distribución por edad -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>🎂 Por edad</h5>
+                @foreach (var item in ViewBag.PorEdad)
+                {
+                    <div class="d-flex justify-content-between">
+                        <span>@item.Key</span>
+                        <strong>@item.Value</strong>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Top distritos -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>📍 Top distritos</h5>
+                @foreach (var item in ViewBag.PorDistrito)
+                {
+                    <div class="d-flex justify-content-between">
+                        <span>@item.Key</span>
+                        <strong>@item.Value</strong>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>🏆 Top 10 rutas más buscadas</h4>
+@if (ViewBag.TopRutas.Count == 0)
+{
+    <p class="text-muted">Aún no hay búsquedas registradas.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Búsquedas</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{int i = 1;}
+            @foreach (var ruta in ViewBag.TopRutas)
+            {
+                <tr>
+                    <td>@i++</td>
+                    <td>@ruta.Origen</td>
+                    <td>@ruta.Destino</td>
+                    <td>@ruta.Contador</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

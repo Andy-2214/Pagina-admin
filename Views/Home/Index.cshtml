@@ -1,8 +1,48 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿
+<div class="row mt-4">
+    <div class="col-12 mb-4">
+        <h2>Panel de Administración</h2>
+        <p class="text-muted">Sistema de Transporte Público - Arequipa</p>
+        <hr/>
+    </div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">🚌 Rutas</h5>
+                <p class="card-text">Gestionar rutas de transporte</p>
+                <a href="/Ruta/Index" class="btn btn-light btn-sm">Ver rutas</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">💬 Comentarios</h5>
+                <p class="card-text">Moderar comentarios de usuarios</p>
+                <a href="/Comentario/Index" class="btn btn-light btn-sm">Ver comentarios</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">🤖 Prompt IA</h5>
+                <p class="card-text">Modificar prompt de la IA</p>
+                <a href="/PromptIA/Index" class="btn btn-light btn-sm">Ver prompt</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-body">
+                <h5 class="card-title">👤 Usuarios</h5>
+                <p class="card-text">Gestionar usuarios registrados</p>
+                <a href="/Usuario/Index" class="btn btn-light btn-sm">Ver usuarios</a>
+            </div>
+        </div>
+    </div>
 </div>

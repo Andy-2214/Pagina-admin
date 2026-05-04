@@ -1,0 +1,55 @@
+@model IEnumerable<TuProyecto.Models.Usuario>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Gestión de Usuarios</h2>
+
+<form method="get" action="/Usuario/Index" class="mb-3 d-flex gap-2">
+    <input type="text" name="buscar" value="@ViewBag.Buscar"
+           class="form-control" placeholder="Buscar por nombre o email..." />
+    <button type="submit" class="btn btn-primary">Buscar</button>
+    @if (!string.IsNullOrEmpty(ViewBag.Buscar as string))
+    {
+        <a href="/Usuario/Index" class="btn btn-secondary">Limpiar</a>
+    }
+</form>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Fecha Registro</th> 
+            <th>Género</th>
+            <th>Edad</th>         
+            <th>Distrito</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var usuario in Model)
+        {
+            <tr>
+                <td>@usuario.Nombre</td>
+                <td>@usuario.Email</td>
+                <td>@usuario.FechaRegistro.ToString("dd/MM/yyyy")</td>
+                <td>@usuario.Genero</td>
+                <td>@usuario.Edad</td>
+                <td>@usuario.Distrito</td>
+                 <td class="d-flex gap-1">
+                    <a href="/Usuario/Perfil/@usuario.Id"
+                       class="btn btn-info btn-sm">
+                        Ver perfil
+                    </a>
+                    <a href="/Usuario/Eliminar/@usuario.Id"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Eliminar este usuario?')">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

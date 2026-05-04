@@ -1,0 +1,39 @@
+@model TuProyecto.Models.Ruta
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Agregar Ruta</h2>
+
+<form method="post" action="/Ruta/Crear">
+<div class="mb-3">
+    <label>Empresa</label>
+    <input type="text" name="Empresa" class="form-control" 
+           placeholder="Ej: Transcayma, Unión Grau..." />
+</div>
+    <div class="mb-3">
+        <label>Código</label>
+        <input type="text" name="Codigo" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input type="text" name="Nombre" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label>Color</label>
+        <input type="color" name="Color" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label>Avenidas</label>
+        <textarea name="Avenidas" class="form-control" rows="3"></textarea>
+    </div>
+    <div class="mb-3">
+        <label>Coordenadas (JSON)</label>
+        <textarea name="CoordenadasJson" class="form-control" rows="5"
+                  placeholder='[{"lat":-16.4014,"lng":-71.5416},{"lat":-16.4025,"lng":-71.5405}]'></textarea>
+        <small class="text-muted">Formato: [{"lat": -16.40, "lng": -71.54}]</small>
+    </div>
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a href="/Ruta/Index" class="btn btn-secondary">Cancelar</a>
+</form>

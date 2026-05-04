@@ -5,7 +5,6 @@ using PaginaAdminSITP.Models;
 
 namespace PaginaAdminSITP.Controllers;
 
-[Authorize]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
@@ -15,15 +14,20 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-    public IActionResult Index()
-    {
-        return View();
-    }
+ public IActionResult Index()
+{
+    if (HttpContext.Session.GetString("AdminEmail") == null)
+        return RedirectToAction("Login", "Auth");
+        
+    return View();
+}
 
     public IActionResult Privacy()
     {
         return View();
     }
+
+
 
     [AllowAnonymous]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -31,4 +35,8 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+    
+
+    
 }
+

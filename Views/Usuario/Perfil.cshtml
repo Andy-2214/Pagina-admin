@@ -1,0 +1,64 @@
+@model TuProyecto.Models.Usuario
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Perfil de Usuario</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-body">
+               <h5 class="card-title">👤 @Model.Nombre</h5>
+<p class="card-text">
+    <strong>Email:</strong> @Model.Email <br/>
+    <strong>Género:</strong> @Model.Genero <br/>
+    <strong>Edad:</strong> @Model.Edad años <br/>
+    <strong>Distrito:</strong> @Model.Distrito <br/>
+    <strong>Registro:</strong> @Model.FechaRegistro.ToString("dd/MM/yyyy")
+</p>
+                <a href="/Usuario/Eliminar/@Model.Id"
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('¿Eliminar este usuario?')">
+                    Eliminar cuenta
+                </a>
+                <a href="/Usuario/Index" class="btn btn-secondary btn-sm">
+                    Volver
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <h4>💬 Comentarios publicados</h4>
+        @if (ViewBag.Comentarios.Count == 0)
+        {
+            <p class="text-muted">Este usuario no ha publicado comentarios.</p>
+        }
+        else
+        {
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Ruta</th>
+                        <th>Comentario</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var comentario in ViewBag.Comentarios)
+                    {
+                        <tr>
+                            <td>@comentario.RutaId</td>
+                            <td>@comentario.Texto</td>
+                            <td>@comentario.Fecha.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+
+                
+            </table>
+        }
+    </div>
+</div>
