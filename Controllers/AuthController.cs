@@ -9,7 +9,7 @@ namespace TuProyecto.Controllers
         private readonly List<string> _admins = new List<string>
         {
             "herbert@gmail.com",
-            "roberto@gmail.com",
+            "arturobauti31@gmail.com",
             "markxx32@gmail.com"
         };
 
