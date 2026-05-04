@@ -4,9 +4,22 @@
 
 <a href="/Ruta/Crear" class="btn btn-primary mb-3">+ Agregar Ruta</a>
 
+
+<form method="get" action="/Ruta/Index" class="mb-3 d-flex gap-2">
+    <input type="text" name="buscar" value="@ViewBag.Buscar" 
+           class="form-control" placeholder="Buscar por código o nombre..." />
+    <button type="submit" class="btn btn-primary">Buscar</button>
+    @if (!string.IsNullOrEmpty(ViewBag.Buscar as string))
+    {
+        <a href="/Ruta/Index" class="btn btn-secondary">Limpiar</a>
+    }
+</form>
+
+
 <table class="table table-bordered">
     <thead>
         <tr>
+            <th>Empresa</th>
             <th>Código</th>
             <th>Nombre</th>
             <th>Color</th>
@@ -18,6 +31,7 @@
         @foreach (var ruta in Model)
         {
             <tr>
+                <td>@ruta.Empresa</td>
                 <td>@ruta.Codigo</td>
                 <td>@ruta.Nombre</td>
                 <td>

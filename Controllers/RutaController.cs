@@ -14,14 +14,25 @@ namespace TuProyecto.Controllers
         }
 
         // Lista de rutas
-        public async Task<IActionResult> Index()
-        {
-            var snapshot = await _db.Collection("rutas").GetSnapshotAsync();
-            var rutas = snapshot.Documents
-                .Select(d => d.ConvertTo<Ruta>())
-                .ToList();
-            return View(rutas);
-        }
+      public async Task<IActionResult> Index(string buscar = "")
+{
+    var snapshot = await _db.Collection("rutas").GetSnapshotAsync();
+    var rutas = snapshot.Documents
+        .Select(d => d.ConvertTo<Ruta>())
+        .ToList();
+
+    if (!string.IsNullOrEmpty(buscar))
+    {
+        rutas = rutas.Where(r => 
+            r.Codigo.Contains(buscar, StringComparison.OrdinalIgnoreCase) ||
+            r.Nombre.Contains(buscar, StringComparison.OrdinalIgnoreCase)||
+            r.Empresa.Contains(buscar, StringComparison.OrdinalIgnoreCase)
+        ).ToList();
+    }
+
+    ViewBag.Buscar = buscar;
+    return View(rutas);
+}
 
         // Formulario agregar
         public IActionResult Crear()
@@ -60,5 +71,9 @@ public async Task<IActionResult> Editar(string id, Ruta ruta)
     await _db.Collection("rutas").Document(id).SetAsync(ruta);
     return RedirectToAction("Index");
 }
+
+
+
+
     }
 }

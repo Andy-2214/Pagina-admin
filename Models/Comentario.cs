@@ -19,5 +19,8 @@ namespace TuProyecto.Models
 
         [FirestoreProperty("fecha")]
         public DateTime Fecha { get; set; }
+
+        [FirestoreProperty("destacado")]
+        public bool Destacado { get; set; }
     }
 }

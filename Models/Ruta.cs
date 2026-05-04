@@ -10,16 +10,16 @@ namespace TuProyecto.Models
         public string Id { get; set; }
 
         [FirestoreProperty("codigo")]
-        public string Codigo { get; set; }
+        public string Codigo { get; set; } = "";
 
-        [FirestoreProperty("color")]
+        [FirestoreProperty("color")] 
         public string Color { get; set; }
 
         [FirestoreProperty("nombre")]
-        public string Nombre { get; set; }
+        public string Nombre { get; set; } = "";
 
         [FirestoreProperty("avenidas")]
-        public string Avenidas { get; set; }
+        public string Avenidas { get; set; } = "";
 
         [FirestoreProperty("coordenadas")]
         public List<Dictionary<string, double>> Coordenadas { get; set; } = new();
@@ -34,5 +34,8 @@ namespace TuProyecto.Models
                     Coordenadas = JsonSerializer.Deserialize<List<Dictionary<string, double>>>(value) ?? new();
             }
         }
+
+ [FirestoreProperty("empresa")]
+public string Empresa { get; set; } = "";
     }
 }

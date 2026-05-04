@@ -16,5 +16,14 @@ namespace TuProyecto.Models
 
         [FirestoreProperty("fechaRegistro")]
         public DateTime FechaRegistro { get; set; }
+        
+        [FirestoreProperty("genero")]
+public string Genero { get; set; } = "";
+
+[FirestoreProperty("edad")]
+public int Edad { get; set; }
+
+[FirestoreProperty("distrito")]
+public string Distrito { get; set; } = "";
     }
 }

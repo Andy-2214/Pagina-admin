@@ -1,23 +1,65 @@
 @model TuProyecto.Models.PromptIA
 
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
 <h2>Gestión de Prompt IA</h2>
 
-<div class="card">
+<div class="card mb-4">
     <div class="card-body">
-        <h5 class="card-title">Prompt Actual</h5>
-        <p class="card-text">@Model.Texto</p>
+        <h5 class="card-title">Prompt Activo</h5>
+        <p class="text-muted">
+            Última modificación: @Model.FechaModificacion.ToString("dd/MM/yyyy HH:mm")
+            por @Model.Autor
+        </p>
+        <form method="post" action="/PromptIA/Actualizar">
+            <div class="mb-3">
+                <textarea name="Texto" class="form-control" rows="8"
+                          required>@Model.Texto</textarea>
+                <small class="text-muted">El prompt no puede estar vacío.</small>
+            </div>
+            <button type="submit" class="btn btn-success">Guardar cambios</button>
+        </form>
     </div>
 </div>
 
-<hr />
-
-<h4>Modificar Prompt</h4>
-
-<form method="post" action="/PromptIA/Actualizar">
-    <div class="mb-3">
-        <label>Nuevo Prompt</label>
-        <textarea name="Texto" class="form-control" 
-                  rows="6">@Model.Texto</textarea>
-    </div>
-    <button type="submit" class="btn btn-success">Guardar</button>
-</form>
+<h4>📋 Historial de versiones</h4>
+@if (ViewBag.Historial.Count == 0)
+{
+    <p class="text-muted">No hay versiones anteriores.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Autor</th>
+                <th>Prompt</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var version in ViewBag.Historial)
+            {
+                <tr>
+                    <td>@version.FechaModificacion.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@version.Autor</td>
+                    <td>
+                        <small>@(version.Texto.Length > 100 
+                            ? version.Texto.Substring(0, 100) + "..." 
+                            : version.Texto)</small>
+                    </td>
+                    <td>
+                        <a href="/PromptIA/Restaurar/@version.Id"
+                           class="btn btn-warning btn-sm"
+                           onclick="return confirm('¿Restaurar esta versión?')">
+                            Restaurar
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

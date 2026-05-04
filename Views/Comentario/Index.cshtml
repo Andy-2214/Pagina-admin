@@ -1,26 +1,66 @@
 @model IEnumerable<TuProyecto.Models.Comentario>
 
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
 <h2>Gestión de Comentarios</h2>
+
+<form method="get" action="/Comentario/Index" class="mb-3 d-flex gap-2">
+    <select name="filtroRuta" class="form-select">
+        <option value="">Todas las rutas</option>
+        @foreach (var ruta in ViewBag.Rutas)
+        {
+            <option value="@ruta.Codigo" 
+                    selected="@(ViewBag.FiltroRuta == ruta.Codigo)">
+                @ruta.Codigo - @ruta.Nombre
+            </option>
+        }
+    </select>
+    <select name="filtroEstado" class="form-select">
+        <option value="">Todos</option>
+        <option value="destacado" selected="@(ViewBag.FiltroEstado == "destacado")">
+            Solo destacados
+        </option>
+    </select>
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+    <a href="/Comentario/Index" class="btn btn-secondary">Limpiar</a>
+</form>
 
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>Ruta ID</th>
-            <th>Usuario ID</th>
+            <th>Ruta</th>
+            <th>Usuario</th>
             <th>Comentario</th>
             <th>Fecha</th>
+            <th>Estado</th>
             <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var comentario in Model)
         {
-            <tr>
+            <tr class="@(comentario.Destacado ? "table-warning" : "")">
                 <td>@comentario.RutaId</td>
                 <td>@comentario.UsuarioId</td>
                 <td>@comentario.Texto</td>
                 <td>@comentario.Fecha.ToString("dd/MM/yyyy")</td>
                 <td>
+                    @if (comentario.Destacado)
+                    {
+                        <span class="badge bg-warning text-dark">⭐ Destacado</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Normal</span>
+                    }
+                </td>
+                <td class="d-flex gap-1">
+                    <a href="/Comentario/Destacar/@comentario.Id?destacado=@comentario.Destacado"
+                       class="btn btn-warning btn-sm">
+                        @(comentario.Destacado ? "Quitar destacado" : "Destacar")
+                    </a>
                     <a href="/Comentario/Eliminar/@comentario.Id"
                        class="btn btn-danger btn-sm"
                        onclick="return confirm('¿Eliminar este comentario?')">

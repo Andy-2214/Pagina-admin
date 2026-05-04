@@ -10,5 +10,11 @@ namespace TuProyecto.Models
 
         [FirestoreProperty("texto")]
         public string Texto { get; set; }
+
+        [FirestoreProperty("fechaModificacion")]
+        public DateTime FechaModificacion { get; set; }
+
+        [FirestoreProperty("autor")]
+        public string Autor { get; set; }
     }
 }
