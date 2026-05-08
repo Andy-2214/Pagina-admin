@@ -1,57 +1,376 @@
 @model IEnumerable<TuProyecto.Models.Ruta>
 
-<h2>Gestión de Rutas</h2>
+@{
+    ViewData["Title"] = "Rutas";
+}
 
-<a href="/Ruta/Crear" class="btn btn-primary mb-3">+ Agregar Ruta</a>
-
-
-<form method="get" action="/Ruta/Index" class="mb-3 d-flex gap-2">
-    <input type="text" name="buscar" value="@ViewBag.Buscar" 
-           class="form-control" placeholder="Buscar por código o nombre..." />
-    <button type="submit" class="btn btn-primary">Buscar</button>
-    @if (!string.IsNullOrEmpty(ViewBag.Buscar as string))
-    {
-        <a href="/Ruta/Index" class="btn btn-secondary">Limpiar</a>
+<style>
+    :root {
+        --primary:   #F5A623;
+        --bg:        #0D0D1A;
+        --surface:   rgba(255,255,255,0.05);
+        --surface-hv:rgba(255,255,255,0.08);
+        --border:    rgba(255,255,255,0.09);
+        --text:      #F0EDE8;
+        --muted:     rgba(240,237,232,0.48);
+        --danger:    #FF6B6B;
+        --warning:   #F5A623;
+        --font-mono: 'Space Mono', monospace;
+        --font-main: 'Sora', sans-serif;
     }
-</form>
 
+    .page-wrap {
+        max-width: 1260px;
+        margin: 0 auto;
+        padding: 2.5rem 2rem 4rem;
+    }
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Empresa</th>
-            <th>Código</th>
-            <th>Nombre</th>
-            <th>Color</th>
-            <th>Avenidas</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var ruta in Model)
+    /* ── page header ── */
+    .page-header {
+        display: flex; align-items: flex-end; justify-content: space-between;
+        margin-bottom: 2rem;
+        opacity: 0;
+        animation: fadeUp .45s ease forwards .05s;
+    }
+    .page-eyebrow {
+        font-family: var(--font-mono);
+        font-size: .65rem; letter-spacing: .16em; text-transform: uppercase;
+        color: var(--primary); margin-bottom: .4rem;
+        display: flex; align-items: center; gap: 7px;
+    }
+    .eyebrow-dot {
+        width: 5px; height: 5px; border-radius: 50%;
+        background: var(--primary);
+        animation: blink 1.4s ease-in-out infinite;
+    }
+    @@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
+
+    .page-title {
+        font-family: var(--font-mono);
+        font-size: 1.7rem; font-weight: 700;
+        color: var(--text); margin: 0;
+    }
+    .page-count {
+        font-size: .8rem; color: var(--muted); margin-top: .3rem;
+        font-family: var(--font-mono);
+    }
+    .page-count span { color: var(--primary); }
+
+    .btn-add {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: var(--primary);
+        color: #0D0D1A; font-family: var(--font-mono);
+        font-size: .78rem; font-weight: 700; letter-spacing: .05em;
+        padding: 10px 20px; border-radius: 9px;
+        text-decoration: none; border: none; cursor: pointer;
+        transition: background .18s, transform .15s;
+        white-space: nowrap;
+    }
+    .btn-add:hover { background: #f0b84a; color: #0D0D1A; transform: translateY(-1px); }
+    .btn-add:active { transform: scale(.97); }
+    .btn-add svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── divider ── */
+    .page-divider {
+        height: 1px;
+        background: linear-gradient(90deg, var(--primary), transparent);
+        margin-bottom: 1.8rem;
+        opacity: 0;
+        animation: fadeUp .35s ease forwards .15s;
+    }
+
+    /* ── search bar ── */
+    .search-row {
+        display: flex; gap: .75rem; align-items: center;
+        margin-bottom: 1.75rem;
+        opacity: 0;
+        animation: fadeUp .4s ease forwards .2s;
+    }
+    .search-wrap {
+        position: relative; flex: 1;
+    }
+    .search-icon {
+        position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+        color: var(--muted); pointer-events: none; font-size: .9rem;
+    }
+    .search-input {
+        width: 100%; padding: 11px 14px 11px 40px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text); font-family: var(--font-mono); font-size: .82rem;
+        outline: none; transition: border-color .2s, background .2s;
+    }
+    .search-input::placeholder { color: rgba(240,237,232,.22); }
+    .search-input:focus {
+        border-color: var(--primary);
+        background: rgba(245,166,35,.05);
+    }
+    .btn-search {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px; padding: 11px 18px;
+        color: var(--text); font-family: var(--font-mono); font-size: .78rem;
+        cursor: pointer; text-decoration: none; white-space: nowrap;
+        transition: border-color .2s, background .2s, color .2s;
+    }
+    .btn-search:hover { border-color: var(--primary); color: var(--primary); background: rgba(245,166,35,.07); }
+
+    .btn-clear {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 10px; padding: 11px 16px;
+        color: var(--muted); font-family: var(--font-mono); font-size: .78rem;
+        cursor: pointer; text-decoration: none; white-space: nowrap;
+        transition: border-color .2s, color .2s;
+    }
+    .btn-clear:hover { border-color: rgba(255,107,107,.4); color: var(--danger); }
+
+    /* ── table ── */
+    .table-wrap {
+        border: 1px solid var(--border);
+        border-radius: 14px; overflow: hidden;
+        opacity: 0;
+        animation: fadeUp .5s ease forwards .3s;
+    }
+
+    .data-table {
+        width: 100%; border-collapse: collapse;
+        font-size: .82rem;
+    }
+
+    .data-table thead {
+        background: rgba(255,255,255,.04);
+        border-bottom: 1px solid var(--border);
+    }
+    .data-table thead th {
+        padding: 13px 16px;
+        font-family: var(--font-mono);
+        font-size: .65rem; letter-spacing: .12em; text-transform: uppercase;
+        color: var(--muted); font-weight: 400;
+        text-align: left; white-space: nowrap;
+    }
+
+    .data-table tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background .15s;
+    }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table tbody tr:hover { background: var(--surface-hv); }
+
+    .data-table td {
+        padding: 13px 16px;
+        color: var(--text);
+        vertical-align: middle;
+    }
+
+    /* empresa badge */
+    .badge-empresa {
+        display: inline-block;
+        font-family: var(--font-mono); font-size: .65rem; letter-spacing: .07em;
+        background: rgba(255,255,255,.07);
+        border: 1px solid var(--border);
+        border-radius: 6px; padding: 3px 10px;
+        color: var(--muted); white-space: nowrap;
+    }
+
+    /* codigo */
+    .cell-codigo {
+        font-family: var(--font-mono); font-size: .78rem;
+        color: var(--primary); font-weight: 700;
+    }
+
+    /* nombre */
+    .cell-nombre { font-weight: 600; }
+
+    /* color swatch */
+    .color-swatch {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-family: var(--font-mono); font-size: .72rem;
+        color: var(--muted);
+    }
+    .swatch-box {
+        width: 22px; height: 22px; border-radius: 6px;
+        border: 1px solid rgba(255,255,255,.15);
+        flex-shrink: 0;
+    }
+
+    /* avenidas */
+    .cell-avenidas {
+        color: var(--muted); font-size: .78rem; line-height: 1.55;
+        max-width: 420px;
+    }
+
+    /* actions */
+    .actions-cell { white-space: nowrap; }
+    .btn-action {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-family: var(--font-mono); font-size: .68rem; letter-spacing: .04em;
+        border-radius: 7px; padding: 6px 12px;
+        border: 1px solid; cursor: pointer; text-decoration: none;
+        transition: background .18s, color .18s;
+    }
+    .btn-action + .btn-action { margin-left: .4rem; }
+    .btn-action svg { width: 11px; height: 11px; flex-shrink: 0; }
+
+    .btn-danger {
+        color: var(--danger);
+        border-color: rgba(255,107,107,.3);
+        background: rgba(255,107,107,.07);
+    }
+    .btn-danger:hover {
+        background: rgba(255,107,107,.18);
+        border-color: rgba(255,107,107,.6);
+        color: var(--danger);
+    }
+
+    .btn-edit {
+        color: var(--primary);
+        border-color: rgba(245,166,35,.3);
+        background: rgba(245,166,35,.07);
+    }
+    .btn-edit:hover {
+        background: rgba(245,166,35,.18);
+        border-color: rgba(245,166,35,.6);
+        color: var(--primary);
+    }
+
+    /* empty state */
+    .empty-state {
+        text-align: center; padding: 4rem 2rem;
+        color: var(--muted);
+    }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: .5; }
+    .empty-title { font-family: var(--font-mono); font-size: .85rem; color: var(--muted); }
+
+    /* row number */
+    .cell-num {
+        font-family: var(--font-mono); font-size: .65rem;
+        color: rgba(255,255,255,.15); text-align: center;
+    }
+
+    @@keyframes fadeUp {
+        from { opacity:0; transform:translateY(14px); }
+        to   { opacity:1; transform:translateY(0); }
+    }
+
+    @@media (max-width: 900px) {
+        .col-avenidas, .col-empresa { display: none; }
+    }
+</style>
+
+<div class="page-wrap">
+
+    <!-- header -->
+    <div class="page-header">
+        <div>
+            <div class="page-eyebrow">
+                <span class="eyebrow-dot"></span> Módulo de gestión
+            </div>
+            <h1 class="page-title">Rutas</h1>
+            <p class="page-count">
+                <span>@Model.Count()</span> rutas registradas
+                @if (!string.IsNullOrEmpty(ViewBag.Buscar as string))
+                {
+                    <text> · filtrando por "<span>@ViewBag.Buscar</span>"</text>
+                }
+            </p>
+        </div>
+        <a href="/Ruta/Crear" class="btn-add">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 1v12M1 7h12"/>
+            </svg>
+            Agregar Ruta
+        </a>
+    </div>
+
+    <div class="page-divider"></div>
+
+    <!-- search -->
+    <form method="get" action="/Ruta/Index" class="search-row">
+        <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input class="search-input" type="text" name="buscar"
+                   value="@ViewBag.Buscar"
+                   placeholder="Buscar por código, nombre o empresa..." />
+        </div>
+        <button type="submit" class="btn-search">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6">
+                <circle cx="5.5" cy="5.5" r="4"/><path d="M9 9l3 3"/>
+            </svg>
+            Buscar
+        </button>
+        @if (!string.IsNullOrEmpty(ViewBag.Buscar as string))
         {
-            <tr>
-                <td>@ruta.Empresa</td>
-                <td>@ruta.Codigo</td>
-                <td>@ruta.Nombre</td>
-                <td>
-                    <span style="background-color:@ruta.Color; 
-                          padding:5px 15px; border-radius:4px;">
-                        @ruta.Color
-                    </span>
-                </td>
-                <td>@ruta.Avenidas</td>
-                <td>
-                    <a href="/Ruta/Eliminar/@ruta.Id" 
-                       class="btn btn-danger btn-sm"
-                       onclick="return confirm('¿Eliminar esta ruta?')">
-                        Eliminar
-                    </a>
-<a href="/Ruta/Editar/@ruta.Id" class="btn btn-warning btn-sm">
-    Editar
-</a>
-                </td>
-            </tr>
+            <a href="/Ruta/Index" class="btn-clear">✕ Limpiar</a>
         }
-    </tbody>
-</table>
+    </form>
+
+    <!-- table -->
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:32px; text-align:center;">#</th>
+                    <th class="col-empresa">Empresa</th>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Color</th>
+                    <th class="col-avenidas">Avenidas</th>
+                    <th style="text-align:right;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-icon">🚌</div>
+                                <div class="empty-title">No se encontraron rutas</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @{ int rowNum = 1; }
+                @foreach (var ruta in Model)
+                {
+                    <tr>
+                        <td class="cell-num">@(rowNum++)</td>
+                        <td class="col-empresa">
+                            <span class="badge-empresa">@ruta.Empresa</span>
+                        </td>
+                        <td class="cell-codigo">@ruta.Codigo</td>
+                        <td class="cell-nombre">@ruta.Nombre</td>
+                        <td>
+                            <div class="color-swatch">
+                                <span class="swatch-box" style="background-color:@ruta.Color;"></span>
+                                @ruta.Color
+                            </div>
+                        </td>
+                        <td class="cell-avenidas col-avenidas">@ruta.Avenidas</td>
+                        <td class="actions-cell" style="text-align:right;">
+                            <a href="/Ruta/Eliminar/@ruta.Id"
+                               class="btn-action btn-danger"
+                               onclick="return confirm('¿Eliminar la ruta @ruta.Nombre?')">
+                                <svg viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.6">
+                                    <path d="M1 3h9M4 3V2h3v1M2 3l.5 7h6L9 3"/>
+                                </svg>
+                                Eliminar
+                            </a>
+                            <a href="/Ruta/Editar/@ruta.Id" class="btn-action btn-edit">
+                                <svg viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.6">
+                                    <path d="M7.5 1.5l2 2L3 10H1V8L7.5 1.5z"/>
+                                </svg>
+                                Editar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

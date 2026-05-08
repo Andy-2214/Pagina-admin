@@ -1,42 +1,360 @@
 @model TuProyecto.Models.Ruta
 
 @{
+    ViewData["Title"] = "Editar Ruta";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Editar Ruta</h2>
+<style>
+    :root {
+        --primary:    #F5A623;
+        --bg:         #0D0D1A;
+        --surface:    rgba(255,255,255,0.05);
+        --surface-hv: rgba(255,255,255,0.08);
+        --border:     rgba(255,255,255,0.09);
+        --text:       #F0EDE8;
+        --muted:      rgba(240,237,232,0.48);
+        --danger:     #FF6B6B;
+        --success:    #3DD68C;
+        --font-mono:  'Space Mono', monospace;
+        --font-main:  'Sora', sans-serif;
+    }
 
-<form method="post" action="/Ruta/Editar/@Model.Id">
-<div class="mb-3">
-    <label>Empresa</label>
-    <input type="text" name="Empresa" class="form-control" 
-           placeholder="Ej: Transcayma, Unión Grau..."  value="@Model.Empresa" required/>
+    .page-wrap {
+        max-width: 780px;
+        margin: 0 auto;
+        padding: 2.5rem 2rem 4rem;
+    }
+
+    .breadcrumb-row {
+        display: flex; align-items: center; gap: 6px;
+        font-family: var(--font-mono); font-size: .68rem;
+        color: var(--muted); margin-bottom: 1.5rem;
+        opacity: 0;
+        animation: fadeUp .4s ease forwards .05s;
+    }
+    .breadcrumb-row a { color: var(--muted); text-decoration: none; transition: color .2s; }
+    .breadcrumb-row a:hover { color: var(--primary); }
+    .breadcrumb-row span { color: var(--text); }
+
+    .page-header {
+        margin-bottom: 2rem;
+        opacity: 0;
+        animation: fadeUp .45s ease forwards .1s;
+    }
+    .page-eyebrow {
+        font-family: var(--font-mono);
+        font-size: .65rem; letter-spacing: .16em; text-transform: uppercase;
+        color: var(--primary); margin-bottom: .4rem;
+        display: flex; align-items: center; gap: 7px;
+    }
+    .eyebrow-dot {
+        width: 5px; height: 5px; border-radius: 50%;
+        background: var(--primary);
+        animation: blink 1.4s ease-in-out infinite;
+    }
+    @@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
+
+    .page-title {
+        font-family: var(--font-mono);
+        font-size: 1.7rem; font-weight: 700; color: var(--text); margin: 0;
+    }
+    .page-title-sub {
+        font-family: var(--font-mono); font-size: .75rem; color: var(--muted); margin-top: .3rem;
+    }
+    .page-title-sub span { color: var(--primary); }
+
+    .page-divider {
+        height: 1px;
+        background: linear-gradient(90deg, var(--primary), transparent);
+        margin-bottom: 2rem;
+        opacity: 0;
+        animation: fadeUp .35s ease forwards .15s;
+    }
+
+    /* ── form card ── */
+    .form-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px; overflow: hidden;
+        opacity: 0;
+        animation: fadeUp .5s ease forwards .2s;
+    }
+
+    .form-card-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 1.1rem 1.6rem;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255,255,255,.03);
+    }
+    .form-card-left { display: flex; align-items: center; gap: 10px; }
+    .form-card-icon {
+        width: 32px; height: 32px; border-radius: 8px;
+        background: rgba(245,166,35,.12);
+        border: 1px solid rgba(245,166,35,.25);
+        display: flex; align-items: center; justify-content: center;
+        font-size: .95rem; flex-shrink: 0;
+    }
+    .form-card-title { font-family: var(--font-mono); font-size: .8rem; font-weight: 700; color: var(--text); }
+    .form-card-sub   { font-family: var(--font-mono); font-size: .63rem; color: var(--muted); margin-top: 1px; }
+
+    .edit-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-family: var(--font-mono); font-size: .62rem; letter-spacing: .08em;
+        text-transform: uppercase;
+        background: rgba(245,166,35,.1); border: 1px solid rgba(245,166,35,.25);
+        border-radius: 20px; padding: 4px 12px; color: var(--primary);
+    }
+    .edit-badge-dot {
+        width: 5px; height: 5px; border-radius: 50%; background: var(--primary);
+        animation: blink 1.4s ease-in-out infinite;
+    }
+
+    .form-body { padding: 1.75rem 1.6rem; }
+
+    .fields-row {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem;
+        margin-bottom: 1.1rem;
+    }
+    .field-group { margin-bottom: 1.1rem; }
+    .field-group:last-of-type { margin-bottom: 0; }
+
+    .field-label {
+        display: block;
+        font-family: var(--font-mono); font-size: .65rem; letter-spacing: .1em;
+        text-transform: uppercase; color: var(--muted); margin-bottom: .5rem;
+    }
+    .field-required { color: var(--primary); margin-left: 3px; }
+
+    .field-wrap { position: relative; }
+    .field-icon {
+        position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+        color: var(--muted); font-size: .9rem; pointer-events: none;
+    }
+
+    .field-input, .field-textarea {
+        width: 100%;
+        background: rgba(0,0,0,.2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text); font-family: var(--font-mono); font-size: .82rem;
+        outline: none; transition: border-color .2s, background .2s;
+    }
+    .field-input  { padding: 11px 13px 11px 38px; }
+    .field-input.no-icon { padding-left: 13px; }
+    .field-input::placeholder, .field-textarea::placeholder { color: rgba(240,237,232,.2); }
+    .field-input:focus, .field-textarea:focus {
+        border-color: var(--primary);
+        background: rgba(245,166,35,.04);
+    }
+    .field-textarea { padding: 12px 13px; resize: vertical; line-height: 1.6; }
+    .field-hint {
+        font-family: var(--font-mono); font-size: .63rem; color: var(--muted);
+        margin-top: .4rem; display: flex; align-items: center; gap: 4px;
+    }
+
+    /* color picker */
+    .color-row { display: flex; align-items: center; gap: .75rem; }
+    .field-color {
+        width: 46px; height: 42px;
+        background: rgba(0,0,0,.2); border: 1px solid var(--border);
+        border-radius: 10px; cursor: pointer; padding: 3px;
+        transition: border-color .2s; flex-shrink: 0;
+    }
+    .field-color:focus { border-color: var(--primary); outline: none; }
+    .color-preview-text {
+        font-family: var(--font-mono); font-size: .78rem; color: var(--muted);
+        display: flex; align-items: center; gap: 8px;
+    }
+    .color-swatch-preview {
+        width: 20px; height: 20px; border-radius: 5px;
+        border: 1px solid rgba(255,255,255,.15); flex-shrink: 0; transition: background .2s;
+    }
+    #colorHexLabel { color: var(--text); }
+
+    .form-sep { height: 1px; background: var(--border); margin: 1.5rem 0; }
+    .form-sep-label {
+        font-family: var(--font-mono); font-size: .62rem; letter-spacing: .12em;
+        text-transform: uppercase; color: var(--muted);
+        margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;
+    }
+    .form-sep-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* footer */
+    .form-footer {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 1rem 1.6rem;
+        border-top: 1px solid var(--border);
+        background: rgba(255,255,255,.02);
+    }
+    .footer-note { font-family: var(--font-mono); font-size: .65rem; color: var(--muted); }
+    .footer-note span { color: var(--primary); }
+    .footer-btns { display: flex; gap: .6rem; }
+
+    .btn-cancel {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-family: var(--font-mono); font-size: .75rem; letter-spacing: .04em;
+        color: var(--muted); border: 1px solid var(--border);
+        background: rgba(255,255,255,.04);
+        border-radius: 9px; padding: 10px 18px;
+        text-decoration: none; transition: color .18s, border-color .18s;
+    }
+    .btn-cancel:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
+
+    .btn-save {
+        display: inline-flex; align-items: center; gap: 7px;
+        font-family: var(--font-mono); font-size: .75rem; font-weight: 700; letter-spacing: .05em;
+        color: #0a1a10; background: var(--success);
+        border: none; border-radius: 9px; padding: 10px 22px;
+        cursor: pointer; transition: background .18s, transform .15s;
+    }
+    .btn-save:hover { background: #5be8a0; }
+    .btn-save:active { transform: scale(.97); }
+    .btn-save svg { width: 13px; height: 13px; }
+
+    @@keyframes fadeUp {
+        from { opacity:0; transform:translateY(14px); }
+        to   { opacity:1; transform:translateY(0); }
+    }
+
+    @@media (max-width: 600px) {
+        .fields-row { grid-template-columns: 1fr; }
+        .form-card-header { flex-direction: column; align-items: flex-start; gap: .6rem; }
+    }
+</style>
+
+<div class="page-wrap">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-row">
+        <a href="/Ruta/Index">Rutas</a>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M3 2l4 3-4 3"/>
+        </svg>
+        <span>Editar — @Model.Nombre</span>
+    </div>
+
+    <!-- header -->
+    <div class="page-header">
+        <div class="page-eyebrow"><span class="eyebrow-dot"></span> Módulo de gestión</div>
+        <h1 class="page-title">Editar Ruta</h1>
+        <p class="page-title-sub">Modificando: <span>@Model.Codigo — @Model.Nombre</span></p>
+    </div>
+
+    <div class="page-divider"></div>
+
+    <!-- form card -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="form-card-left">
+                <div class="form-card-icon">✏️</div>
+                <div>
+                    <div class="form-card-title">Editar datos de la ruta</div>
+                    <div class="form-card-sub">Los cambios se aplicarán inmediatamente al guardar</div>
+                </div>
+            </div>
+            <div class="edit-badge">
+                <span class="edit-badge-dot"></span> Editando
+            </div>
+        </div>
+
+        <form method="post" action="/Ruta/Editar/@Model.Id">
+            <div class="form-body">
+
+                <!-- empresa -->
+                <div class="field-group">
+                    <label class="field-label">Empresa <span class="field-required">*</span></label>
+                    <div class="field-wrap">
+                        <span class="field-icon">🏢</span>
+                        <input type="text" name="Empresa" class="field-input"
+                               value="@Model.Empresa"
+                               placeholder="Ej: Transcayma, Unión Grau..." required />
+                    </div>
+                </div>
+
+                <!-- codigo + nombre -->
+                <div class="fields-row">
+                    <div class="field-group" style="margin-bottom:0;">
+                        <label class="field-label">Código <span class="field-required">*</span></label>
+                        <div class="field-wrap">
+                            <span class="field-icon">#</span>
+                            <input type="text" name="Codigo" class="field-input"
+                                   value="@Model.Codigo" required />
+                        </div>
+                    </div>
+                    <div class="field-group" style="margin-bottom:0;">
+                        <label class="field-label">Nombre <span class="field-required">*</span></label>
+                        <div class="field-wrap">
+                            <span class="field-icon">✏</span>
+                            <input type="text" name="Nombre" class="field-input"
+                                   value="@Model.Nombre" required />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- color -->
+                <div class="field-group">
+                    <label class="field-label">Color identificador <span class="field-required">*</span></label>
+                    <div class="color-row">
+                        <input type="color" name="Color" id="colorPicker"
+                               class="field-color" value="@Model.Color" required />
+                        <div class="color-preview-text">
+                            <span class="color-swatch-preview" id="colorSwatch" style="background:@Model.Color;"></span>
+                            <span id="colorHexLabel">@Model.Color</span>
+                            <span style="color:var(--muted);">— color de la línea en el mapa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- avenidas -->
+                <div class="field-group">
+                    <label class="field-label">Avenidas / Recorrido</label>
+                    <textarea name="Avenidas" class="field-textarea" rows="3">@Model.Avenidas</textarea>
+                </div>
+
+                <div class="form-sep"></div>
+                <div class="form-sep-label">// coordenadas</div>
+
+                <!-- coordenadas -->
+                <div class="field-group">
+                    <label class="field-label">Coordenadas (JSON)</label>
+                    <textarea name="CoordenadasJson" class="field-textarea" rows="5">@Model.CoordenadasJson</textarea>
+                    <p class="field-hint">
+                        ℹ Formato esperado:
+                        <code style="color:var(--primary); font-size:.65rem;">[{"lat": -16.40, "lng": -71.54}, ...]</code>
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="form-footer">
+                <div class="footer-note">Los campos con <span>*</span> son obligatorios</div>
+                <div class="footer-btns">
+                    <a href="/Ruta/Index" class="btn-cancel">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6">
+                            <path d="M9 2L3 6l6 4"/>
+                        </svg>
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn-save">
+                        <svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M2 7l3 3 6-6"/>
+                        </svg>
+                        Guardar cambios
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
 </div>
-    <div class="mb-3">
-        <label>Código</label>
-        <input type="text" name="Codigo" class="form-control" 
-               value="@Model.Codigo" required />
-    </div>
-    <div class="mb-3">
-        <label>Nombre</label>
-        <input type="text" name="Nombre" class="form-control" 
-               value="@Model.Nombre" required />
-    </div>
-    <div class="mb-3">
-        <label>Color</label>
-        <input type="color" name="Color" class="form-control" 
-               value="@Model.Color" required />
-    </div>
-    <div class="mb-3">
-        <label>Avenidas</label>
-        <textarea name="Avenidas" class="form-control" 
-                  rows="3">@Model.Avenidas</textarea>
-    </div>
-    <div class="mb-3">
-        <label>Coordenadas (JSON)</label>
-        <textarea name="CoordenadasJson" class="form-control" rows="5">@Model.CoordenadasJson</textarea>
-        <small class="text-muted">Formato: [{"lat": -16.40, "lng": -71.54}]</small>
-    </div>
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a href="/Ruta/Index" class="btn btn-secondary">Cancelar</a>
-</form>
+
+<script>
+    const picker = document.getElementById('colorPicker');
+    const swatch = document.getElementById('colorSwatch');
+    const label  = document.getElementById('colorHexLabel');
+    picker.addEventListener('input', function () {
+        swatch.style.background = this.value;
+        label.textContent = this.value.toUpperCase();
+    });
+</script>

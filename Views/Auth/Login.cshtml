@@ -1,42 +1,501 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Login Admin</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Admin – Transporte Arequipa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary:    #F5A623;
+            --primary-dk: #C87D0E;
+            --accent:     #1A1A2E;
+            --surface:    rgba(255,255,255,0.06);
+            --glass:      rgba(255,255,255,0.10);
+            --border:     rgba(255,255,255,0.14);
+            --text:       #F0EDE8;
+            --muted:      rgba(240,237,232,0.55);
+            --danger:     #E05C5C;
+        }
+
+        html, body {
+            min-height: 100%;
+            font-family: 'Sora', sans-serif;
+            background: #0D0D1A;
+            overflow-x: hidden;
+        }
+
+        /* ─── INTRO OVERLAY ─── */
+        #intro {
+            position: fixed; inset: 0; z-index: 100;
+            background: #0D0D1A;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 28px;
+        }
+
+        .bus-track {
+            width: 340px; height: 64px;
+            position: relative; overflow: hidden;
+        }
+        .bus-track::before {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: trackPulse 2s ease-in-out infinite;
+        }
+        @@keyframes trackPulse {
+            0%,100% { opacity:.3; } 50% { opacity:1; }
+        }
+
+        .bus-svg {
+            position: absolute; bottom: 8px;
+            animation: busDrive 2.4s cubic-bezier(.4,0,.2,1) forwards;
+            opacity: 0;
+        }
+        @@keyframes busDrive {
+            0%   { left: -100px; opacity:0; }
+            15%  { opacity:1; }
+            80%  { left: 50%; transform: translateX(-50%); }
+            100% { left: 50%; transform: translateX(-50%); }
+        }
+
+        .intro-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.05rem; letter-spacing: .22em; text-transform: uppercase;
+            color: var(--primary);
+            opacity: 0;
+            animation: fadeUp .6s ease forwards 1.8s;
+        }
+        .intro-sub {
+            font-size: .78rem; letter-spacing: .15em; text-transform: uppercase;
+            color: var(--muted);
+            opacity: 0;
+            animation: fadeUp .6s ease forwards 2.1s;
+        }
+
+        .intro-bar-wrap {
+            width: 200px; height: 2px;
+            background: rgba(255,255,255,.1);
+            border-radius: 2px; overflow: hidden;
+            opacity: 0;
+            animation: fadeUp .3s ease forwards 2.2s;
+        }
+        .intro-bar {
+            height: 100%; width: 0; background: var(--primary);
+            animation: loadBar 1.1s ease forwards 2.3s;
+        }
+        @@keyframes loadBar { to { width: 100%; } }
+
+        @@keyframes fadeUp {
+            from { opacity:0; transform:translateY(10px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        /* intro exit */
+        #intro.exit {
+            animation: introExit .7s ease forwards;
+        }
+        @@keyframes introExit {
+            to { opacity:0; transform:scale(1.04) translateY(-8px); pointer-events:none; }
+        }
+
+        /* ─── MAIN LAYOUT ─── */
+        #app {
+            display: grid;
+            grid-template-columns: 1fr 480px;
+            min-height: 100vh;
+            opacity: 0;
+        }
+        #app.visible {
+            animation: appFadeIn .8s ease forwards;
+        }
+        @@keyframes appFadeIn {
+            to { opacity:1; }
+        }
+
+        /* LEFT PANEL */
+        .panel-left {
+            position: sticky; top: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #0D0D1A 0%, #16213E 60%, #1A1A2E 100%);
+            display: flex; flex-direction: column;
+            justify-content: flex-end;
+            padding: 3.5rem;
+            overflow: hidden;
+        }
+
+        /* animated road lines */
+        .road {
+            position: absolute; inset: 0; pointer-events: none;
+            overflow: hidden;
+        }
+        .road::before, .road::after {
+            content: '';
+            position: absolute;
+            width: 1px; background: rgba(245,166,35,.13);
+        }
+        .road::before { left: 30%; top:0; bottom:0; }
+        .road::after  { left: 70%; top:0; bottom:0; }
+
+        .road-line {
+            position: absolute; left: 49.5%; width: 2px;
+            background: linear-gradient(180deg, transparent, rgba(245,166,35,.5), transparent);
+            animation: roadScroll 1.6s linear infinite;
+        }
+        @@keyframes roadScroll {
+            from { top: -120%; } to { top: 120%; }
+        }
+
+        /* city silhouette */
+        .city {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 240px;
+            background:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 200'%3E%3Crect x='0'   y='120' width='60'  height='80'  fill='%231e2840'/%3E%3Crect x='50'  y='80'  width='40'  height='120' fill='%23222c47'/%3E%3Crect x='80'  y='100' width='70'  height='100' fill='%231a2038'/%3E%3Crect x='140' y='60'  width='50'  height='140' fill='%23243055'/%3E%3Crect x='180' y='90'  width='80'  height='110' fill='%231e2840'/%3E%3Crect x='250' y='40'  width='45'  height='160' fill='%2327345e'/%3E%3Crect x='285' y='70'  width='60'  height='130' fill='%231e2840'/%3E%3Crect x='340' y='100' width='50'  height='100' fill='%23222c47'/%3E%3Crect x='380' y='55'  width='40'  height='145' fill='%2327345e'/%3E%3Crect x='410' y='80'  width='70'  height='120' fill='%231a2038'/%3E%3Crect x='470' y='30'  width='55'  height='170' fill='%232a3a6e'/%3E%3Crect x='515' y='70'  width='65'  height='130' fill='%23222c47'/%3E%3Crect x='570' y='90'  width='45'  height='110' fill='%231e2840'/%3E%3Crect x='605' y='50'  width='60'  height='150' fill='%2327345e'/%3E%3Crect x='655' y='75'  width='80'  height='125' fill='%231a2038'/%3E%3Crect x='720' y='100' width='80'  height='100' fill='%23222c47'/%3E%3C/svg%3E")
+                bottom/cover no-repeat;
+            opacity: .7;
+        }
+
+        .dots-grid {
+            position: absolute; inset: 0; pointer-events: none;
+            background-image: radial-gradient(rgba(245,166,35,.07) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        .left-content { position: relative; z-index: 2; }
+        .left-logo {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 2.5rem;
+        }
+        .logo-icon {
+            width: 44px; height: 44px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+        }
+        .logo-text {
+            font-family: 'Space Mono', monospace;
+            font-size: .9rem; letter-spacing: .08em;
+            color: var(--text);
+        }
+        .logo-text span { color: var(--primary); }
+
+        .left-headline {
+            font-size: 2.6rem; font-weight: 700; line-height: 1.18;
+            color: var(--text); margin-bottom: 1rem;
+        }
+        .left-headline em { color: var(--primary); font-style: normal; }
+
+        .left-desc {
+            font-size: .95rem; color: var(--muted); line-height: 1.7;
+            max-width: 340px; margin-bottom: 2.5rem;
+        }
+
+        .stats-row {
+            display: flex; gap: 2.5rem;
+        }
+        .stat { }
+        .stat-num {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.6rem; font-weight: 700; color: var(--primary);
+        }
+        .stat-lbl {
+            font-size: .72rem; text-transform: uppercase;
+            letter-spacing: .1em; color: var(--muted); margin-top: 2px;
+        }
+
+        /* RIGHT PANEL */
+        .panel-right {
+            background: rgba(13,13,26,.92);
+            backdrop-filter: blur(24px);
+            border-left: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            padding: 3rem 2.5rem;
+            min-height: 100vh;
+        }
+
+        .login-card {
+            width: 100%; max-width: 360px;
+        }
+
+        .card-badge {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: rgba(245,166,35,.12);
+            border: 1px solid rgba(245,166,35,.25);
+            border-radius: 40px;
+            padding: 5px 14px;
+            font-size: .72rem; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--primary);
+            margin-bottom: 1.8rem;
+        }
+        .badge-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--primary);
+            animation: blink 1.4s ease-in-out infinite;
+        }
+        @@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
+
+        .card-title {
+            font-size: 1.75rem; font-weight: 700; color: var(--text);
+            margin-bottom: .4rem; line-height: 1.2;
+        }
+        .card-sub {
+            font-size: .85rem; color: var(--muted); margin-bottom: 2.2rem;
+        }
+
+        /* divider */
+        .divider {
+            height: 1px; background: var(--border); margin-bottom: 2rem;
+        }
+
+        .field-group { margin-bottom: 1.25rem; }
+        .field-label {
+            font-size: .72rem; text-transform: uppercase; letter-spacing: .1em;
+            color: var(--muted); margin-bottom: .5rem; display: block;
+        }
+
+        .field-wrap {
+            position: relative;
+        }
+        .field-icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--muted); font-size: 1rem; pointer-events: none;
+        }
+        .field-input {
+            width: 100%; padding: 13px 14px 13px 42px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text); font-family: 'Sora', sans-serif; font-size: .9rem;
+            outline: none; transition: border-color .2s, background .2s;
+        }
+        .field-input::placeholder { color: rgba(240,237,232,.25); }
+        .field-input:focus {
+            border-color: var(--primary);
+            background: rgba(245,166,35,.06);
+        }
+
+        .toggle-pw {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer;
+            color: var(--muted); font-size: .85rem; padding: 0;
+            transition: color .2s;
+        }
+        .toggle-pw:hover { color: var(--primary); }
+
+        .row-extra {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1.8rem;
+        }
+        .remember {
+            display: flex; align-items: center; gap: 8px;
+            font-size: .8rem; color: var(--muted); cursor: pointer;
+        }
+        .remember input[type="checkbox"] {
+            accent-color: var(--primary); width: 15px; height: 15px; cursor: pointer;
+        }
+        .forgot { font-size: .8rem; color: var(--primary); text-decoration: none; }
+        .forgot:hover { text-decoration: underline; color: var(--primary-dk); }
+
+        .btn-login {
+            width: 100%; padding: 14px;
+            background: var(--primary);
+            border: none; border-radius: 10px;
+            font-family: 'Sora', sans-serif; font-weight: 600; font-size: .95rem;
+            color: #0D0D1A; cursor: pointer;
+            position: relative; overflow: hidden;
+            transition: background .2s, transform .15s;
+        }
+        .btn-login:hover { background: #f0b84a; }
+        .btn-login:active { transform: scale(.98); }
+
+        .btn-login .btn-text { position: relative; z-index: 1; }
+        .btn-login .btn-shine {
+            position: absolute; top: 0; left: -100%;
+            width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+            transform: skewX(-20deg);
+            transition: none;
+        }
+        .btn-login:hover .btn-shine {
+            animation: shine .5s ease forwards;
+        }
+        @@keyframes shine { to { left: 150%; } }
+
+        .error-box {
+            display: none;
+            background: rgba(224,92,92,.1);
+            border: 1px solid rgba(224,92,92,.3);
+            border-radius: 8px; padding: 10px 14px;
+            font-size: .82rem; color: var(--danger);
+            margin-bottom: 1.2rem;
+            align-items: center; gap: 8px;
+        }
+        .error-box.show { display: flex; }
+
+        .card-footer-note {
+            text-align: center; margin-top: 2rem;
+            font-size: .72rem; color: var(--muted);
+        }
+
+        /* responsive */
+        @@media (max-width: 860px) {
+            #app { grid-template-columns: 1fr; }
+            .panel-left { display: none; }
+        }
+    </style>
 </head>
-<body class="bg-dark">
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="text-center mb-4">🚌 Panel Admin</h4>
-                    
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger">@ViewBag.Error</div>
-                    }
-                    
-                    <form method="post" action="/Auth/Login">
-                        <div class="mb-3">
-                            <label>Email</label>
-                            <input type="email" name="Email" 
-                                   class="form-control" required />
-                        </div>
-                        <div class="mb-3">
-                            <label>Contraseña</label>
-                            <input type="password" name="Password" 
-                                   class="form-control" required />
-                        </div>
-                        <button type="submit" 
-                                class="btn btn-primary w-100">
-                            Ingresar
-                        </button>
-                    </form>
+<body>
+
+<!-- ─── INTRO ─── -->
+<div id="intro">
+    <div class="bus-track">
+        <svg class="bus-svg" width="80" height="44" viewBox="0 0 80 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="6" width="72" height="30" rx="5" fill="#F5A623"/>
+            <rect x="6" y="10" width="20" height="12" rx="2" fill="#1A1A2E" opacity=".7"/>
+            <rect x="30" y="10" width="20" height="12" rx="2" fill="#1A1A2E" opacity=".7"/>
+            <rect x="54" y="10" width="18" height="12" rx="2" fill="#1A1A2E" opacity=".7"/>
+            <rect x="2" y="30" width="72" height="6" rx="2" fill="#C87D0E"/>
+            <circle cx="16" cy="38" r="6" fill="#222"/>
+            <circle cx="16" cy="38" r="3" fill="#555"/>
+            <circle cx="60" cy="38" r="6" fill="#222"/>
+            <circle cx="60" cy="38" r="3" fill="#555"/>
+            <rect x="70" y="12" width="8" height="6" rx="1" fill="#FFE08A"/>
+        </svg>
+    </div>
+    <p class="intro-title">Transporte Arequipa</p>
+    <p class="intro-sub">Sistema de Administración</p>
+    <div class="intro-bar-wrap"><div class="intro-bar"></div></div>
+</div>
+
+<!-- ─── APP ─── -->
+<div id="app">
+
+    <!-- LEFT -->
+    <div class="panel-left">
+        <div class="dots-grid"></div>
+        <div class="road">
+            <div class="road-line" style="height:120px; animation-delay:0s;"></div>
+            <div class="road-line" style="height:80px;  animation-delay:.5s;"></div>
+            <div class="road-line" style="height:100px; animation-delay:1s;"></div>
+        </div>
+        <div class="city"></div>
+        <div class="left-content">
+            <div class="left-logo">
+                <div class="logo-icon">🚌</div>
+                <div class="logo-text">ADMIN<br><span>TRANSPORTE</span></div>
+            </div>
+            <h1 class="left-headline">
+                Gestión inteligente<br>de <em>rutas urbanas</em>
+            </h1>
+            <p class="left-desc">
+                Panel de control para administrar rutas, usuarios y reportes 
+                del sistema de transporte público de Arequipa.
+            </p>
+            <div class="stats-row">
+                <div class="stat">
+                    <div class="stat-num">48</div>
+                    <div class="stat-lbl">Rutas activas</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">312</div>
+                    <div class="stat-lbl">Unidades</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">99.2%</div>
+                    <div class="stat-lbl">Uptime</div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- RIGHT -->
+    <div class="panel-right">
+        <div class="login-card">
+
+            <div class="card-badge">
+                <span class="badge-dot"></span> Sistema activo
+            </div>
+
+            <h2 class="card-title">Bienvenido</h2>
+            <p class="card-sub">Ingresa tus credenciales de administrador</p>
+            <div class="divider"></div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="error-box show">
+                    ⚠ @ViewBag.Error
+                </div>
+            }
+
+            <form method="post" action="/Auth/Login" id="loginForm">
+
+                <div class="field-group">
+                    <label class="field-label" for="email">Correo electrónico</label>
+                    <div class="field-wrap">
+                        <span class="field-icon">✉</span>
+                        <input class="field-input" type="email" id="email"
+                               name="Email" placeholder="admin@transporte.pe" required />
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="password">Contraseña</label>
+                    <div class="field-wrap">
+                        <span class="field-icon">🔒</span>
+                        <input class="field-input" type="password" id="password"
+                               name="Password" placeholder="••••••••" required />
+                        <button type="button" class="toggle-pw" id="togglePw"
+                                aria-label="Mostrar contraseña">👁</button>
+                    </div>
+                </div>
+
+                <div class="row-extra">
+                    <label class="remember">
+                        <input type="checkbox" name="RememberMe" />
+                        Recordar sesión
+                    </label>
+                    <a href="#" class="forgot">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    <span class="btn-shine"></span>
+                    <span class="btn-text">Ingresar al panel</span>
+                </button>
+
+            </form>
+
+            <p class="card-footer-note">
+                © 2026 Transporte Arequipa · Acceso restringido
+            </p>
+        </div>
+    </div>
 </div>
+
+<script>
+    // ── intro timing ──
+    setTimeout(() => {
+        const intro = document.getElementById('intro');
+        intro.classList.add('exit');
+        setTimeout(() => {
+            intro.style.display = 'none';
+            const app = document.getElementById('app');
+            app.classList.add('visible');
+        }, 700);
+    }, 3600);
+
+    // ── toggle password ──
+    document.getElementById('togglePw').addEventListener('click', function () {
+        const pw = document.getElementById('password');
+        pw.type = pw.type === 'password' ? 'text' : 'password';
+        this.textContent = pw.type === 'password' ? '👁' : '🙈';
+    });
+</script>
 </body>
 </html>

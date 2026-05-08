@@ -1,48 +1,384 @@
 ﻿
-<div class="row mt-4">
-    <div class="col-12 mb-4">
-        <h2>Panel de Administración</h2>
-        <p class="text-muted">Sistema de Transporte Público - Arequipa</p>
-        <hr/>
-    </div>
+@{
+    ViewData["Title"] = "Dashboard";
+}
 
-    <div class="col-md-3">
-        <div class="card text-white bg-primary mb-3">
-            <div class="card-body">
-                <h5 class="card-title">🚌 Rutas</h5>
-                <p class="card-text">Gestionar rutas de transporte</p>
-                <a href="/Ruta/Index" class="btn btn-light btn-sm">Ver rutas</a>
+<style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+        --primary:    #F5A623;
+        --primary-dk: #C87D0E;
+        --bg:         #0D0D1A;
+        --surface:    rgba(255,255,255,0.05);
+        --surface-hv: rgba(255,255,255,0.09);
+        --border:     rgba(255,255,255,0.10);
+        --border-hv:  rgba(245,166,35,0.45);
+        --text:       #F0EDE8;
+        --muted:      rgba(240,237,232,0.50);
+        --font-mono:  'Space Mono', monospace;
+        --font-main:  'Sora', sans-serif;
+    }
+
+    body {
+        background: var(--bg);
+        font-family: var(--font-main);
+        color: var(--text);
+        min-height: 100vh;
+    }
+
+    /* ── page wrapper ── */
+    .dash-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 3rem 2rem 4rem;
+    }
+
+    /* ── header ── */
+    .dash-header {
+        display: flex; align-items: flex-end; justify-content: space-between;
+        margin-bottom: 3rem;
+        opacity: 0;
+        animation: slideDown .55s ease forwards .1s;
+    }
+    .dash-header-left {}
+    .dash-eyebrow {
+        font-family: var(--font-mono);
+        font-size: .68rem; letter-spacing: .18em; text-transform: uppercase;
+        color: var(--primary); margin-bottom: .5rem;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .eyebrow-dot {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--primary);
+        animation: blink 1.4s ease-in-out infinite;
+    }
+    @@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
+
+    .dash-title {
+        font-family: var(--font-mono);
+        font-size: 2rem; font-weight: 700; line-height: 1.1;
+        color: var(--text); margin: 0;
+    }
+    .dash-title span { color: var(--primary); }
+
+    .dash-subtitle {
+        font-size: .85rem; color: var(--muted); margin-top: .4rem;
+    }
+
+    .dash-date {
+        font-family: var(--font-mono);
+        font-size: .72rem; color: var(--muted); text-align: right;
+    }
+    .dash-date strong { color: var(--text); display: block; font-size: .9rem; }
+
+    /* ── divider ── */
+    .dash-divider {
+        height: 1px;
+        background: linear-gradient(90deg, var(--primary), transparent);
+        margin-bottom: 2.5rem;
+        opacity: 0;
+        animation: slideDown .4s ease forwards .25s;
+    }
+
+    /* ── stats bar ── */
+    .stats-bar {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        border-radius: 12px; overflow: hidden;
+        margin-bottom: 2.5rem;
+        opacity: 0;
+        animation: slideDown .5s ease forwards .3s;
+    }
+    .stat-cell {
+        background: var(--surface);
+        padding: 1.1rem 1.4rem;
+        transition: background .2s;
+    }
+    .stat-cell:hover { background: var(--surface-hv); }
+    .stat-val {
+        font-family: var(--font-mono);
+        font-size: 1.55rem; font-weight: 700; color: var(--primary);
+        line-height: 1;
+    }
+    .stat-lbl {
+        font-size: .7rem; text-transform: uppercase; letter-spacing: .1em;
+        color: var(--muted); margin-top: 4px;
+    }
+
+    /* ── section label ── */
+    .section-lbl {
+        font-family: var(--font-mono);
+        font-size: .68rem; letter-spacing: .15em; text-transform: uppercase;
+        color: var(--muted); margin-bottom: 1.2rem;
+        opacity: 0;
+        animation: slideDown .4s ease forwards .4s;
+    }
+
+    /* ── cards grid ── */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .mod-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.6rem 1.5rem;
+        position: relative; overflow: hidden;
+        transition: border-color .25s, background .25s, transform .2s;
+        text-decoration: none; color: inherit;
+        display: block;
+        opacity: 0;
+        animation: cardIn .5s ease forwards;
+    }
+    .mod-card:nth-child(1) { animation-delay: .45s; }
+    .mod-card:nth-child(2) { animation-delay: .55s; }
+    .mod-card:nth-child(3) { animation-delay: .65s; }
+    .mod-card:nth-child(4) { animation-delay: .75s; }
+
+    .mod-card::before {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: var(--card-accent, var(--primary));
+        opacity: 0; transition: opacity .25s;
+    }
+    .mod-card:hover { 
+        border-color: var(--border-hv);
+        background: var(--surface-hv);
+        transform: translateY(-4px);
+    }
+    .mod-card:hover::before { opacity: 1; }
+
+    /* card accent colors */
+    .mod-card.c-blue   { --card-accent: #4A9EFF; }
+    .mod-card.c-green  { --card-accent: #3DD68C; }
+    .mod-card.c-amber  { --card-accent: #F5A623; }
+    .mod-card.c-red    { --card-accent: #FF6B6B; }
+
+    .card-icon-wrap {
+        width: 46px; height: 46px; border-radius: 12px;
+        background: rgba(255,255,255,.07);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.3rem; margin-bottom: 1.1rem;
+        border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .card-tag {
+        font-family: var(--font-mono);
+        font-size: .62rem; letter-spacing: .12em; text-transform: uppercase;
+        color: var(--card-accent, var(--primary));
+        margin-bottom: .5rem;
+    }
+
+    .card-name {
+        font-size: 1.1rem; font-weight: 600; color: var(--text);
+        margin-bottom: .4rem;
+    }
+
+    .card-desc {
+        font-size: .82rem; color: var(--muted); line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-family: var(--font-mono);
+        font-size: .72rem; letter-spacing: .08em;
+        color: var(--card-accent, var(--primary));
+        border: 1px solid var(--card-accent, var(--primary));
+        border-radius: 6px; padding: 7px 14px;
+        background: transparent; text-decoration: none;
+        transition: background .2s, color .2s;
+    }
+    .card-btn:hover {
+        background: var(--card-accent, var(--primary));
+        color: #0D0D1A;
+    }
+    .card-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+    /* corner number */
+    .card-num {
+        position: absolute; top: 1.2rem; right: 1.4rem;
+        font-family: var(--font-mono);
+        font-size: .68rem; color: rgba(255,255,255,.12);
+        font-weight: 700;
+    }
+
+    /* ── animations ── */
+    @@keyframes slideDown {
+        from { opacity:0; transform:translateY(-12px); }
+        to   { opacity:1; transform:translateY(0); }
+    }
+    @@keyframes cardIn {
+        from { opacity:0; transform:translateY(20px) scale(.97); }
+        to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+
+    /* ── quick access footer ── */
+    .quick-row {
+        margin-top: 2.5rem; padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+        opacity: 0;
+        animation: slideDown .4s ease forwards .85s;
+    }
+    .quick-lbl {
+        font-family: var(--font-mono);
+        font-size: .65rem; letter-spacing: .12em; text-transform: uppercase;
+        color: var(--muted); margin-right: .5rem;
+    }
+    .quick-chip {
+        font-size: .75rem; color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 20px; padding: 5px 14px;
+        text-decoration: none; transition: border-color .2s, color .2s;
+        font-family: var(--font-mono);
+    }
+    .quick-chip:hover { border-color: var(--primary); color: var(--primary); }
+
+    @@media (max-width: 700px) {
+        .dash-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        .stats-bar { grid-template-columns: repeat(2,1fr); }
+    }
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+<div class="dash-wrap">
+
+    <!-- header -->
+    <div class="dash-header">
+        <div class="dash-header-left">
+            <div class="dash-eyebrow">
+                <span class="eyebrow-dot"></span> Panel de control
             </div>
+            <h1 class="dash-title">Admin <span>Transporte</span></h1>
+            <p class="dash-subtitle">Sistema de Transporte Público · Arequipa</p>
+        </div>
+        <div class="dash-date">
+            <strong id="js-time">--:--</strong>
+            <span id="js-date">-- --- ----</span>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card text-white bg-success mb-3">
-            <div class="card-body">
-                <h5 class="card-title">💬 Comentarios</h5>
-                <p class="card-text">Moderar comentarios de usuarios</p>
-                <a href="/Comentario/Index" class="btn btn-light btn-sm">Ver comentarios</a>
-            </div>
+    <div class="dash-divider"></div>
+
+    <!-- stats bar -->
+    <div class="stats-bar">
+        <div class="stat-cell">
+            <div class="stat-val">48</div>
+            <div class="stat-lbl">Rutas activas</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-val">312</div>
+            <div class="stat-lbl">Unidades</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-val" id="stat-users">—</div>
+            <div class="stat-lbl">Usuarios reg.</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-val">99.2%</div>
+            <div class="stat-lbl">Uptime</div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card text-white bg-warning mb-3">
-            <div class="card-body">
-                <h5 class="card-title">🤖 Prompt IA</h5>
-                <p class="card-text">Modificar prompt de la IA</p>
-                <a href="/PromptIA/Index" class="btn btn-light btn-sm">Ver prompt</a>
-            </div>
-        </div>
+    <!-- section label -->
+    <p class="section-lbl">// módulos del sistema</p>
+
+    <!-- cards -->
+    <div class="cards-grid">
+
+        <!-- Rutas -->
+        <a href="/Ruta/Index" class="mod-card c-blue">
+            <span class="card-num">01</span>
+            <div class="card-icon-wrap">🚌</div>
+            <div class="card-tag">Gestión</div>
+            <div class="card-name">Rutas</div>
+            <div class="card-desc">Administra, crea y edita las rutas de transporte público de la ciudad.</div>
+            <span class="card-btn">
+                Ver rutas
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M1 6h10M6 1l5 5-5 5"/>
+                </svg>
+            </span>
+        </a>
+
+        <!-- Comentarios -->
+        <a href="/Comentario/Index" class="mod-card c-green">
+            <span class="card-num">02</span>
+            <div class="card-icon-wrap">💬</div>
+            <div class="card-tag">Moderación</div>
+            <div class="card-name">Comentarios</div>
+            <div class="card-desc">Revisa y modera los comentarios enviados por los usuarios del sistema.</div>
+            <span class="card-btn">
+                Ver comentarios
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M1 6h10M6 1l5 5-5 5"/>
+                </svg>
+            </span>
+        </a>
+
+        <!-- Prompt IA -->
+        <a href="/PromptIA/Index" class="mod-card c-amber">
+            <span class="card-num">03</span>
+            <div class="card-icon-wrap">🤖</div>
+            <div class="card-tag">Inteligencia Artificial</div>
+            <div class="card-name">Prompt IA</div>
+            <div class="card-desc">Configura y ajusta el prompt del asistente de IA integrado al sistema.</div>
+            <span class="card-btn">
+                Ver prompt
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M1 6h10M6 1l5 5-5 5"/>
+                </svg>
+            </span>
+        </a>
+
+        <!-- Usuarios -->
+        <a href="/Usuario/Index" class="mod-card c-red">
+            <span class="card-num">04</span>
+            <div class="card-icon-wrap">👤</div>
+            <div class="card-tag">Acceso</div>
+            <div class="card-name">Usuarios</div>
+            <div class="card-desc">Gestiona las cuentas de los usuarios registrados en la plataforma.</div>
+            <span class="card-btn">
+                Ver usuarios
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M1 6h10M6 1l5 5-5 5"/>
+                </svg>
+            </span>
+        </a>
+
     </div>
 
-    <div class="col-md-3">
-        <div class="card text-white bg-danger mb-3">
-            <div class="card-body">
-                <h5 class="card-title">👤 Usuarios</h5>
-                <p class="card-text">Gestionar usuarios registrados</p>
-                <a href="/Usuario/Index" class="btn btn-light btn-sm">Ver usuarios</a>
-            </div>
-        </div>
+    <!-- quick access -->
+    <div class="quick-row">
+        <span class="quick-lbl">Acceso rápido →</span>
+        <a href="/Ruta/Index" class="quick-chip">Rutas</a>
+        <a href="/Comentario/Index" class="quick-chip">Comentarios</a>
+        <a href="/PromptIA/Index" class="quick-chip">Prompt IA</a>
+        <a href="/Usuario/Index" class="quick-chip">Usuarios</a>
+        <a href="/Dashboard" class="quick-chip">Dashboard</a>
     </div>
+
 </div>
+
+<script>
+    (function () {
+        const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+        const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        function tick() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2,'0');
+            const m = String(now.getMinutes()).padStart(2,'0');
+            document.getElementById('js-time').textContent = h + ':' + m;
+            document.getElementById('js-date').textContent =
+                dias[now.getDay()] + ', ' + now.getDate() + ' ' + meses[now.getMonth()] + ' ' + now.getFullYear();
+        }
+        tick(); setInterval(tick, 10000);
+    })();
+</script>
