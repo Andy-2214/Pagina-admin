@@ -205,7 +205,8 @@
     </style>
 </head>
 <body>
-
+@if (ViewData["HideNavbar"] == null)
+{
 <!-- ════ NAVBAR ════ -->
 <nav class="top-nav" role="navigation" aria-label="Navegación principal">
 
@@ -258,7 +259,7 @@
     </div>
 
 </nav>
-
+}
 <!-- ════ CONTENT ════ -->
 <main>
     @RenderBody()
