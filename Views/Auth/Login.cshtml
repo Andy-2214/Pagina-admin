@@ -1,3 +1,6 @@
+@{
+    Layout = null;
+}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -480,15 +483,28 @@
 
 <script>
     // ── intro timing ──
-    setTimeout(() => {
+    // Si hay error de login, saltar la animación de introducción al instante
+    const hasError = @((ViewBag.Error != null).ToString().ToLower());
+
+    (function () {
         const intro = document.getElementById('intro');
-        intro.classList.add('exit');
-        setTimeout(() => {
+        const app   = document.getElementById('app');
+
+        if (hasError) {
+            // Credenciales incorrectas: ocultar intro de inmediato, mostrar formulario
             intro.style.display = 'none';
-            const app = document.getElementById('app');
-            app.classList.add('visible');
-        }, 700);
-    }, 3600);
+            app.style.opacity   = '1';
+        } else {
+            // Primera visita o después de cerrar sesión: reproducir animación completa
+            setTimeout(() => {
+                intro.classList.add('exit');
+                setTimeout(() => {
+                    intro.style.display = 'none';
+                    app.classList.add('visible');
+                }, 700);
+            }, 3600);
+        }
+    })();
 
     // ── toggle password ──
     document.getElementById('togglePw').addEventListener('click', function () {
