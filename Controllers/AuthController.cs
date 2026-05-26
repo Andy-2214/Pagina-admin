@@ -8,7 +8,7 @@ namespace TuProyecto.Controllers
         private readonly IConfiguration _config;
         private readonly List<string> _admins = new List<string>
         {
-            "herbert@gmail.com",
+            "hchoqqueccota@gmail.com",
             "arturobauti31@gmail.com",
             "markxx32@gmail.com"
         };
