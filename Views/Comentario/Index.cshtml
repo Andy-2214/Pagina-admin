@@ -390,11 +390,19 @@
                 {
                     <tr class="@(comentario.Destacado ? "row-destacado" : "")">
                         <td class="cell-num">@(rowNum++)</td>
-                        <td><span class="badge-ruta">@comentario.RutaId</span></td>
+   <td>
+    <span class="badge-ruta">
+        @(!string.IsNullOrEmpty(comentario.RutaCodigo) 
+            ? comentario.RutaCodigo 
+            : comentario.RutaId)
+    </span>
+</td>
                         <td class="col-usuario">
                             <div class="user-chip">
-                                <div class="user-avatar">U</div>
-                                <span class="user-id">@comentario.UsuarioId</span>
+                                <div class="user-avatar">
+    @(string.IsNullOrEmpty(comentario.NombreUsuario) ? "U" : comentario.NombreUsuario.Substring(0,1).ToUpper())
+</div>
+<span class="user-id">@comentario.NombreUsuario</span>
                             </div>
                         </td>
                         <td class="cell-texto">@comentario.Texto</td>
