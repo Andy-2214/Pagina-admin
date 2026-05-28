@@ -22,5 +22,11 @@ namespace TuProyecto.Models
 
         [FirestoreProperty("destacado")]
         public bool Destacado { get; set; }
+
+        [FirestoreProperty("nombreUsuario")]
+         public string NombreUsuario { get; set; } = "";
+
+[FirestoreProperty("rutaCodigo")]
+public string RutaCodigo { get; set; } = "";
     }
 }

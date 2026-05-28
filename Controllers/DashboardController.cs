@@ -82,8 +82,8 @@ namespace TuProyecto.Controllers
                             : g.Key,
                         CodigoRuta = ruta?.Codigo ?? "",
                         Total      = g.Count(),
-                        Negativos  = g.Count(c => !c.Destacado),   // no destacados = negativos/normales
-                        Positivos  = g.Count(c =>  c.Destacado)
+                        Negativos = g.Count(c => !c.Destacado),   // no destacados = negativos/normales
+                        Positivos = g.Count(c =>  c.Destacado)
                     };
                 })
                 .OrderByDescending(x => x.Total)
@@ -92,22 +92,31 @@ namespace TuProyecto.Controllers
             ViewBag.ComentariosPorRuta = comentariosPorRuta;
 
             // ── Búsquedas ────────────────────────────────────────────
-            var busquedasSnapshot = await _db.Collection("busquedas")
-                .OrderByDescending("contador")
-                .Limit(10)
-                .GetSnapshotAsync();
+           var busquedasSnapshot = await _db.Collection("busquedas_global")
+    .OrderByDescending("fecha")
+    .Limit(200)
+    .GetSnapshotAsync();
 
-            var topRutas = busquedasSnapshot.Documents
-                .Select(d => new
-                {
-                    Origen   = d.ContainsField("origen")  ? d.GetValue<string>("origen")  : "—",
-                    Destino  = d.ContainsField("destino") ? d.GetValue<string>("destino") : "—",
-                    Contador = d.ContainsField("contador") ? d.GetValue<int>("contador")  : 0
-                })
-                .ToList();
+          var topRutas = busquedasSnapshot.Documents
+    .Select(d => new
+    {
+        Origen   = d.ContainsField("origen")  ? d.GetValue<string>("origen")  : "—",
+        Destino  = d.ContainsField("destino") ? d.GetValue<string>("destino") : "—",
+        Contador = 1  // cada documento es una búsqueda
+    })
+    .GroupBy(x => new { x.Origen, x.Destino })
+    .Select(g => new
+    {
+        Origen   = g.Key.Origen,
+        Destino  = g.Key.Destino,
+        Contador = g.Count()
+    })
+    .OrderByDescending(x => x.Contador)
+    .Take(10)
+    .ToList();
 
-            ViewBag.TopRutas         = topRutas;
-            ViewBag.TotalBusquedas   = topRutas.Sum(r => r.Contador);
+ViewBag.TopRutas       = topRutas;
+ViewBag.TotalBusquedas = topRutas.Sum(r => r.Contador);
 
             return View();
         }

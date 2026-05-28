@@ -1,6 +1,7 @@
 using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Mvc;
 using TuProyecto.Models;
+using FirebaseAdmin.Auth;
 
 namespace TuProyecto.Controllers
 {
@@ -53,9 +54,22 @@ namespace TuProyecto.Controllers
 
         // Eliminar usuario
         public async Task<IActionResult> Eliminar(string id)
-        {
-            await _db.Collection("usuarios").Document(id).DeleteAsync();
-            return RedirectToAction("Index");
-        }
+{
+    try
+    {
+        // Eliminar de Authentication
+        await FirebaseAuth.DefaultInstance.DeleteUserAsync(id);
+    }
+    catch (Exception)
+    {
+        // Si no existe en Auth, igual continuamos
+    }
+    
+    // Eliminar de Firestore
+    await _db.Collection("usuarios").Document(id).DeleteAsync();
+    
+    return RedirectToAction("Index");
+}
+
     }
 }
