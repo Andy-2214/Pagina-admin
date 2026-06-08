@@ -268,24 +268,24 @@
     <div class="dash-divider"></div>
 
     <!-- stats bar -->
-    <div class="stats-bar">
-        <div class="stat-cell">
-            <div class="stat-val">48</div>
-            <div class="stat-lbl">Rutas activas</div>
-        </div>
-        <div class="stat-cell">
-            <div class="stat-val">312</div>
-            <div class="stat-lbl">Unidades</div>
-        </div>
-        <div class="stat-cell">
-            <div class="stat-val" id="stat-users">—</div>
-            <div class="stat-lbl">Usuarios reg.</div>
-        </div>
-        <div class="stat-cell">
-            <div class="stat-val">99.2%</div>
-            <div class="stat-lbl">Uptime</div>
-        </div>
+  <div class="stats-bar">
+    <div class="stat-cell">
+        <div class="stat-val">@(ViewBag.TotalRutas ?? 0)</div>
+        <div class="stat-lbl">Rutas activas</div>
     </div>
+    <div class="stat-cell">
+        <div class="stat-val">312</div>
+        <div class="stat-lbl">Unidades</div>
+    </div>
+    <div class="stat-cell">
+        <div class="stat-val">@(ViewBag.TotalUsuarios ?? 0)</div>
+        <div class="stat-lbl">Usuarios reg.</div>
+    </div>
+    <div class="stat-cell">
+        <div class="stat-val">99.2%</div>
+        <div class="stat-lbl">Uptime</div>
+    </div>
+</div>
 
     <!-- section label -->
     <p class="section-lbl">// módulos del sistema</p>
