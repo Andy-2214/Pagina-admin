@@ -12,7 +12,7 @@ namespace TuProyecto.Models
         [FirestoreProperty("codigo")]
         public string Codigo { get; set; } = "";
 
-        [FirestoreProperty("color")] 
+        [FirestoreProperty("color")]
         public string Color { get; set; }
 
         [FirestoreProperty("nombre")]
@@ -21,10 +21,17 @@ namespace TuProyecto.Models
         [FirestoreProperty("avenidas")]
         public string Avenidas { get; set; } = "";
 
+        // ── NUEVO: itinerario de vuelta ───────────────────────────────────
+        [FirestoreProperty("avenidaVuelta")]
+        public string AvenidaVuelta { get; set; } = "";
+
+        [FirestoreProperty("empresa")]
+        public string Empresa { get; set; } = "";
+
+        // ── Coordenadas IDA ───────────────────────────────────────────────
         [FirestoreProperty("coordenadas")]
         public List<Dictionary<string, double>> Coordenadas { get; set; } = new();
 
-        // Para manejar el JSON del formulario
         public string CoordenadasJson
         {
             get => JsonSerializer.Serialize(Coordenadas);
@@ -35,7 +42,18 @@ namespace TuProyecto.Models
             }
         }
 
- [FirestoreProperty("empresa")]
-public string Empresa { get; set; } = "";
+        // ── NUEVO: Coordenadas VUELTA ─────────────────────────────────────
+        [FirestoreProperty("coordenadasVuelta")]
+        public List<Dictionary<string, double>> CoordenadasVuelta { get; set; } = new();
+
+        public string CoordenadasVueltaJson
+        {
+            get => JsonSerializer.Serialize(CoordenadasVuelta);
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                    CoordenadasVuelta = JsonSerializer.Deserialize<List<Dictionary<string, double>>>(value) ?? new();
+            }
+        }
     }
 }
