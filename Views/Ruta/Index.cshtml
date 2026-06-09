@@ -197,6 +197,16 @@
         flex-shrink: 0;
     }
 
+    /* etiqueta badge */
+    .badge-etiqueta {
+        display: inline-block;
+        font-family: var(--font-mono); font-size: .65rem; letter-spacing: .07em;
+        background: rgba(245,166,35,.10);
+        border: 1px solid rgba(245,166,35,.25);
+        border-radius: 6px; padding: 3px 10px;
+        color: var(--primary); white-space: nowrap;
+    }
+
     /* avenidas */
     .cell-avenidas {
         color: var(--muted); font-size: .78rem; line-height: 1.55;
@@ -257,7 +267,7 @@
     }
 
     @@media (max-width: 900px) {
-        .col-avenidas, .col-empresa { display: none; }
+        .col-avenidas, .col-empresa, .col-etiqueta { display: none; }
     }
 </style>
 
@@ -318,6 +328,7 @@
                     <th>Código</th>
                     <th>Nombre</th>
                     <th>Color</th>
+                    <th class="col-etiqueta">Etiqueta</th>
                     <th class="col-avenidas">Avenidas</th>
                     <th style="text-align:right;">Acciones</th>
                 </tr>
@@ -326,7 +337,7 @@
                 @if (!Model.Any())
                 {
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
                             <div class="empty-state">
                                 <div class="empty-icon">🚌</div>
                                 <div class="empty-title">No se encontraron rutas</div>
@@ -349,6 +360,16 @@
                                 <span class="swatch-box" style="background-color:@ruta.Color;"></span>
                                 @ruta.Color
                             </div>
+                        </td>
+                        <td class="col-etiqueta">
+                            @if (!string.IsNullOrEmpty(ruta.Etiqueta))
+                            {
+                                <span class="badge-etiqueta">@ruta.Etiqueta</span>
+                            }
+                            else
+                            {
+                                <span style="color:rgba(240,237,232,.2); font-family:var(--font-mono); font-size:.7rem;">—</span>
+                            }
                         </td>
                         <td class="cell-avenidas col-avenidas">@ruta.Avenidas</td>
                         <td class="actions-cell" style="text-align:right;">

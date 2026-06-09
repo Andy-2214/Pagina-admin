@@ -50,12 +50,17 @@ namespace TuProyecto.Controllers
             return View(ruta);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Editar(string id, Ruta ruta)
-        {
-            await _db.Collection("rutas").Document(id).SetAsync(ruta);
-            return RedirectToAction("Index");
-        }
+       [HttpPost]
+public async Task<IActionResult> Editar(string id, Ruta ruta)
+{
+    // debug
+    var json = Request.Form["CoordenadasJson"].ToString();
+    Console.WriteLine("CoordenadasJson recibido: " + json);
+    Console.WriteLine("Coordenadas count: " + ruta.Coordenadas.Count);
+    
+    await _db.Collection("rutas").Document(id).SetAsync(ruta);
+    return RedirectToAction("Index");
+}
 
         public async Task<IActionResult> Eliminar(string id)
         {

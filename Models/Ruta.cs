@@ -18,10 +18,12 @@ namespace TuProyecto.Models
         [FirestoreProperty("nombre")]
         public string Nombre { get; set; } = "";
 
+        [FirestoreProperty("etiqueta")]
+        public string Etiqueta { get; set; } = "";
+
         [FirestoreProperty("avenidas")]
         public string Avenidas { get; set; } = "";
 
-        // ── NUEVO: itinerario de vuelta ───────────────────────────────────
         [FirestoreProperty("avenidaVuelta")]
         public string AvenidaVuelta { get; set; } = "";
 
@@ -42,7 +44,7 @@ namespace TuProyecto.Models
             }
         }
 
-        // ── NUEVO: Coordenadas VUELTA ─────────────────────────────────────
+        // ── Coordenadas VUELTA ─────────────────────────────────────────────
         [FirestoreProperty("coordenadasVuelta")]
         public List<Dictionary<string, double>> CoordenadasVuelta { get; set; } = new();
 
