@@ -134,6 +134,16 @@
                     </div>
                 </div>
 
+                <!-- ── NUEVO: Etiqueta ── -->
+                <div class="field-group">
+                    <label class="field-label">Etiqueta</label>
+                    <div class="field-wrap">
+                        <span class="field-icon">🏷</span>
+                        <input type="text" name="Etiqueta" class="field-input" value="@Model.Etiqueta" placeholder="Ej: Express, Nocturno, Escolar..." />
+                    </div>
+                    <p class="field-hint">ℹ Etiqueta opcional para clasificar la ruta</p>
+                </div>
+
                 <div class="field-group">
                     <label class="field-label">Color identificador <span class="field-required">*</span></label>
                     <div class="color-row">
@@ -151,7 +161,6 @@
                     <textarea name="Avenidas" class="field-textarea" rows="3">@Model.Avenidas</textarea>
                 </div>
 
-                <!-- avenidaVuelta -->
                 <div class="field-group">
                     <label class="field-label">Avenidas / Recorrido (VUELTA)</label>
                     <textarea name="AvenidaVuelta" class="field-textarea" rows="3"
@@ -170,7 +179,6 @@
                     <p class="field-hint">ℹ Formato: <code style="color:var(--primary); font-size:.65rem;">[{"lat": -16.40, "lng": -71.54}, ...]</code></p>
                 </div>
 
-                <!-- ── NUEVO: Coordenadas Vuelta ── -->
                 <div class="field-group">
                     <label class="field-label">Coordenadas VUELTA (JSON)</label>
                     <textarea name="CoordenadasVueltaJson" class="field-textarea" rows="5"
