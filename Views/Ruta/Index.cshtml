@@ -19,6 +19,18 @@
         --font-main: 'Sora', sans-serif;
     }
 
+    .aviso-sync {
+        display: flex; gap: 10px; align-items: flex-start;
+        margin: 0 0 1.25rem; padding: .8rem 1rem;
+        background: rgba(245,166,35,0.08);
+        border: 1px solid rgba(245,166,35,0.35);
+        border-radius: 10px;
+        font-size: .78rem; line-height: 1.5; color: var(--text);
+    }
+    .aviso-sync code {
+        font-family: var(--font-mono); color: var(--primary);
+    }
+
     .page-wrap {
         max-width: 1260px;
         margin: 0 auto;
@@ -297,6 +309,16 @@
     </div>
 
     <div class="page-divider"></div>
+
+    <div class="aviso-sync">
+        <span>⚠</span>
+        <span>
+            Crear, editar o eliminar rutas desde este panel avisa solo a las apps.
+            Si cambias <code>rutas</code> o <code>cuencas</code> <strong>a mano</strong> en la consola de Firebase
+            (o con un script), debes sumar 1 al campo <code>rutas</code> del documento
+            <code>metadatos/version</code>; si no, los celulares no se enteran del cambio.
+        </span>
+    </div>
 
     <!-- search -->
     <form method="get" action="/Ruta/Index" class="search-row">

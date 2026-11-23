@@ -134,6 +134,32 @@
                     </div>
                 </div>
 
+                <div class="fields-row">
+                    <div class="field-group" style="margin-bottom:0;">
+                        <label class="field-label">Cuenca <span class="field-required">*</span></label>
+                        <div class="field-wrap">
+                            <span class="field-icon">🗂</span>
+                            <input type="text" name="Cuenca" class="field-input" value="@Model.Cuenca" required placeholder="Ej: C5, ALB, CHI" />
+                        </div>
+                    </div>
+                    <div class="field-group" style="margin-bottom:0;">
+                        <label class="field-label">Código de combi</label>
+                        <div class="field-wrap">
+                            <span class="field-icon">#</span>
+                            <input type="text" name="CodigoCombi" class="field-input" value="@Model.CodigoCombi" placeholder="Ej: 12" />
+                        </div>
+                    </div>
+                </div>
+                <p class="field-hint" style="margin-bottom:14px;">ℹ La cuenca debe existir en la colección "cuencas"; si no, la app no muestra la ruta</p>
+
+                <div class="field-group">
+                    <label class="field-label">Frecuencia</label>
+                    <div class="field-wrap">
+                        <span class="field-icon">⏱</span>
+                        <input type="text" name="Frecuencia" class="field-input" value="@Model.Frecuencia" placeholder="Ej: 10 a 15 min" />
+                    </div>
+                </div>
+
                 <!-- ── NUEVO: Etiqueta ── -->
                 <div class="field-group">
                     <label class="field-label">Etiqueta</label>

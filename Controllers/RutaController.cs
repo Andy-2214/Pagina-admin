@@ -13,6 +13,20 @@ namespace TuProyecto.Controllers
             _db = db;
         }
 
+        // Documento contador que lee la app Android: si "rutas" cambia, la app vuelve a
+        // descargar rutas y cuencas. Se sube en el MISMO batch que el cambio, asi nunca
+        // queda una ruta cambiada sin version nueva (ni al reves).
+        // Set + MergeAll (en vez de Update) para que no falle si el documento no existe.
+        private void SubirVersionRutas(WriteBatch batch)
+        {
+            var meta = _db.Collection("metadatos").Document("version");
+            batch.Set(meta, new Dictionary<string, object>
+            {
+                { "rutas", FieldValue.Increment(1) },
+                { "actualizadoEn", FieldValue.ServerTimestamp }
+            }, SetOptions.MergeAll);
+        }
+
         public async Task<IActionResult> Index(string buscar = "")
         {
             var snapshot = await _db.Collection("rutas").GetSnapshotAsync();
@@ -39,7 +53,10 @@ namespace TuProyecto.Controllers
             // CoordenadasJson y CoordenadasVueltaJson ya fueron procesados
             // por los setters del modelo al hacer el binding del form.
             // Solo hay que guardar el objeto directamente.
-            await _db.Collection("rutas").AddAsync(ruta);
+            var batch = _db.StartBatch();
+            batch.Set(_db.Collection("rutas").Document(), ruta);
+            SubirVersionRutas(batch);
+            await batch.CommitAsync();
             return RedirectToAction("Index");
         }
 
@@ -58,13 +75,31 @@ public async Task<IActionResult> Editar(string id, Ruta ruta)
     Console.WriteLine("CoordenadasJson recibido: " + json);
     Console.WriteLine("Coordenadas count: " + ruta.Coordenadas.Count);
     
-    await _db.Collection("rutas").Document(id).SetAsync(ruta);
+    var docRef = _db.Collection("rutas").Document(id);
+    var actual = await docRef.GetSnapshotAsync();
+    if (!actual.Exists)
+        return NotFound();
+
+    // La app compara la version de cada ruta para saber si cambio.
+    // Si el documento no tiene version, la app asume 1: se parte de ahi.
+    long versionActual = actual.TryGetValue("version", out long v) ? v : 1L;
+    ruta.Version = versionActual + 1;
+
+    // MergeAll: solo escribe los campos del modelo y NO borra los demas
+    // campos que pueda tener el documento.
+    var batch = _db.StartBatch();
+    batch.Set(docRef, ruta, SetOptions.MergeAll);
+    SubirVersionRutas(batch);
+    await batch.CommitAsync();
     return RedirectToAction("Index");
 }
 
         public async Task<IActionResult> Eliminar(string id)
         {
-            await _db.Collection("rutas").Document(id).DeleteAsync();
+            var batch = _db.StartBatch();
+            batch.Delete(_db.Collection("rutas").Document(id));
+            SubirVersionRutas(batch);
+            await batch.CommitAsync();
             return RedirectToAction("Index");
         }
     }

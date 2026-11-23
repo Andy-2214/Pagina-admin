@@ -30,6 +30,23 @@ namespace TuProyecto.Models
         [FirestoreProperty("empresa")]
         public string Empresa { get; set; } = "";
 
+        // ── Campos que usa la app Android ────────────────────────────────────
+        // Deben existir en el modelo para que el formulario los conserve al editar.
+        // La app descarta una ruta cuya cuenca no existe en la coleccion "cuencas".
+        [FirestoreProperty("cuenca")]
+        public string Cuenca { get; set; } = "";
+
+        [FirestoreProperty("codigoCombi")]
+        public string CodigoCombi { get; set; } = "";
+
+        [FirestoreProperty("frecuencia")]
+        public string Frecuencia { get; set; } = "";
+
+        // La app compara este numero para saber si una ruta cambio.
+        // No esta en los formularios: Editar lo sube en 1 al guardar.
+        [FirestoreProperty("version")]
+        public long Version { get; set; } = 1;
+
         // ── Coordenadas IDA ───────────────────────────────────────────────
         [FirestoreProperty("coordenadas")]
         public List<Dictionary<string, double>> Coordenadas { get; set; } = new();
